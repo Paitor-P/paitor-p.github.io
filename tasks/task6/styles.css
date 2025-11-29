@@ -1,0 +1,159 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f5f5f5;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Блок 3 - отображение выбранного слова */
+#block3 {
+    background-color: #eee;
+    padding: 10px;
+    margin-bottom: 15px;
+    text-align: center;
+    font-size: 18px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* Ввод и кнопка */
+.input-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    gap: 10px;
+}
+
+#inputField {
+    flex-grow: 1;
+    padding: 8px;
+    border: 2px solid #ff6b6b;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+#parseButton {
+    padding: 8px 16px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+#parseButton:hover {
+    background-color: #45a049;
+}
+
+/* Основной контейнер для блоков 1 и 2 */
+.blocks-container {
+    display: flex;
+    gap: 20px;
+}
+
+.input-and-block1 {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Блок 2 - исходные элементы */
+#block2 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 300px;
+    background-color: white;
+    border: 2px solid #4CAF50;
+    border-radius: 8px;
+    padding: 15px;
+    min-height: 400px;
+}
+
+.block-title {
+    font-weight: bold;
+    margin-bottom: 10px;
+    text-align: center;
+    color: #4CAF50;
+}
+
+#itemsBlock2 {
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+    gap: 5px;
+}
+
+/* Элементы в блоке 2 */
+.item-block2 {
+    background-color: #4CAF50;
+    color: black;
+    padding: 8px 15px;
+    margin: 5px 0;
+    border-radius: 20px 0 0 20px;
+    cursor: grab;
+    user-select: none;
+    transition: all 0.2s ease;
+}
+
+.item-block2:active {
+    cursor: grabbing;
+}
+
+/* Блок 1 - перемещенные элементы */
+#block1 {
+    flex-grow: 1;
+    background-color: white;
+    border: 2px solid #2196F3;
+    border-radius: 8px;
+    padding: 15px;
+    min-height: 400px;
+}
+
+#itemsBlock1 {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+/* Элементы в блоке 1 */
+.item-block1 {
+    padding: 8px 15px;
+    margin: 5px 0;
+    border-radius: 20px 0 0 20px;
+    cursor: grab;
+    user-select: none;
+    transition: all 0.2s ease;
+
+    position: absolute; /* Позиционируем абсолютно внутри itemsBlock1 */
+    box-sizing: border-box; /* Включаем padding и border в размеры */
+    user-select: none; /* Запретить выделение текста при перетаскивании */
+    z-index: 10; /* Чтобы элементы были поверх других при перетаскивании */
+}
+
+.item-block1:active {
+    cursor: grabbing;
+}
+
+/* Стили для перетаскивания */
+.dragging {
+    opacity: 0.7;
+    transform: scale(1.05);
+}
+
+/* Подсказка при нажатии */
+.click-info {
+    background-color: #f0f0f0;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    text-align: center;
+}
