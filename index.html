@@ -1,62 +1,2186 @@
 <!DOCTYPE html>
 <html lang="ru">
-
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Amulets of Hollow Knight</title>
-  <link rel="stylesheet" href="css/style.css" />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Inter:wght@400;600&display=swap"
-    rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Пирамида - Игра</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #6c5ce7;
+            --secondary: #00cec9;
+            --accent: #fdcb6e;
+            --dark: #2d3436;
+            --light: #f7f7f7;
+            --success: #00b894;
+            --error: #ff7675;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #2c3e50);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            color: var(--light);
+            touch-action: manipulation;
+            background-attachment: fixed;
+        }
+
+        .screen {
+            display: none;
+            width: 100%;
+            max-width: 900px;
+            padding: 2rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .screen.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .auth-screen, .level-select-screen, .game-screen, .results-screen, .leaderboard-screen {
+            background: rgba(45, 52, 54, 0.85);
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-screen::before, .level-select-screen::before, .game-screen::before, 
+        .results-screen::before, .leaderboard-screen::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(108, 92, 231, 0.1) 0%, transparent 70%);
+            z-index: -1;
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .logo h1 {
+            font-size: 3.5rem;
+            background: linear-gradient(to right, var(--secondary), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 10px rgba(0, 206, 201, 0.3);
+            margin-bottom: 0.5rem;
+            position: relative;
+        }
+
+        .logo h1::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(to right, var(--secondary), var(--primary));
+            border-radius: 2px;
+            animation: pulseLine 2s infinite;
+        }
+
+        @keyframes pulseLine {
+            0% { width: 80px; opacity: 1; }
+            50% { width: 120px; opacity: 0.7; }
+            100% { width: 80px; opacity: 1; }
+        }
+
+        .logo p {
+            font-size: 1.2rem;
+            color: #b2bec3;
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        .input-group {
+            margin: 2rem 0;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            font-size: 1.1rem;
+            transition: var(--transition);
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(0, 206, 201, 0.3);
+        }
+
+        .btn {
+            background: linear-gradient(to right, var(--primary), #5646e0);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-block;
+            margin: 0.5rem;
+            min-width: 180px;
+            box-shadow: 0 4px 15px rgba(108, 92, 231, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(108, 92, 231, 0.6);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(to right, #55efc4, #00b894);
+            box-shadow: 0 4px 15px rgba(0, 184, 148, 0.4);
+        }
+
+        .btn-secondary:hover {
+            box-shadow: 0 6px 20px rgba(0, 184, 148, 0.6);
+        }
+
+        .btn-large {
+            padding: 1.2rem 3rem;
+            font-size: 1.3rem;
+        }
+
+        .btn-leaderboard {
+            background: linear-gradient(to right, #fdcb6e, #e17055);
+            margin-top: 1rem;
+        }
+
+        .levels-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .level-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: var(--transition);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transform: scale(1);
+        }
+
+        .level-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            border-color: var(--secondary);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .level-card.locked {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: scale(1);
+        }
+
+        .level-card.locked:hover {
+            transform: scale(1);
+            box-shadow: none;
+        }
+
+        .level-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--secondary);
+        }
+
+        .level-card:nth-child(2)::before {
+            background: #fdcb6e;
+        }
+
+        .level-card:nth-child(3)::before {
+            background: #ff7675;
+        }
+
+        .level-card h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--secondary);
+            position: relative;
+        }
+
+        .level-card h2::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 2px;
+            background: currentColor;
+            opacity: 0.7;
+        }
+
+        .level-card.locked h2 {
+            color: #b2bec3;
+        }
+
+        .level-card p {
+            color: #dfe6e9;
+            margin-bottom: 1.5rem;
+            min-height: 80px;
+        }
+
+        .level-card button {
+            display: block;
+            margin: 0 auto 1rem auto;
+        }
+
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem 2rem;
+            border-radius: 16px;
+            font-size: 1.2rem;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .timer, .score, .remaining {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .remaining {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            font-weight: bold;
+        }
+
+        .game-area {
+            width: 100%;
+            height: 400px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            touch-action: none;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.3);
+            cursor: default;
+        }
+
+        .game-area::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 30%, rgba(0, 206, 201, 0.05) 0%, transparent 40%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .rod {
+            width: 12px;
+            height: 320px;
+            background: linear-gradient(to bottom, #74b9ff, #0984e3);
+            position: absolute;
+            bottom: 20px;
+            border-radius: 6px;
+            z-index: 1;
+            box-shadow: 0 0 10px rgba(9, 132, 227, 0.5);
+            transform: translateX(-50%);
+            left: 50%;
+        }
+
+        .base {
+            width: 120px;
+            height: 20px;
+            background: linear-gradient(to right, #55efc4, #00b894);
+            position: absolute;
+            bottom: 0;
+            border-radius: 10px 10px 0 0;
+            z-index: 1;
+            box-shadow: 0 3px 10px rgba(0, 184, 148, 0.4);
+            transform: translateX(-50%);
+            left: 50%;
+        }
+
+        .source-area {
+            position: absolute;
+            left: 50px;
+            bottom: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .ring {
+            height: 24px;
+            border-radius: 12px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            transition: var(--transition);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            user-select: none;
+            font-size: 12px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            padding: 0 5px;
+            transform: translateX(0);
+        }
+
+        .ring:hover {
+            transform: translateX(10px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        .ring.animate-drop {
+            animation: dropRing 0.4s ease-out;
+        }
+
+        @keyframes dropRing {
+            0% { transform: translateY(-50px) scale(1); opacity: 0.8; }
+            70% { transform: translateY(0) scale(1.05); opacity: 1; }
+            100% { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
+        .floating-ring {
+            position: absolute;
+            top: 50px;
+            height: 30px;
+            border-radius: 15px;
+            background: linear-gradient(45deg, #ff9ff3, #f368e0);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 0 15px rgba(243, 104, 224, 0.7);
+            z-index: 10;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 0 10px;
+            touch-action: manipulation;
+            transform: scale(1);
+            transition: transform 0.2s ease;
+        }
+
+        .floating-ring:hover {
+            transform: scale(1.05);
+        }
+
+        .floating-ring:active {
+            transform: scale(0.95);
+        }
+
+        .ball {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #ff9ff3, #f368e0);
+            box-shadow: 0 0 15px rgba(243, 104, 224, 0.8);
+            z-index: 20;
+            cursor: grab;
+            display: none;
+            transition: transform 0.1s ease;
+        }
+
+        .ball.dragging {
+            cursor: grabbing;
+            transform: scale(1.1);
+            box-shadow: 0 0 25px rgba(243, 104, 224, 1);
+        }
+
+        .ball.escaped {
+            animation: escapeBall 0.5s ease-out;
+        }
+
+        @keyframes escapeBall {
+            0% { transform: scale(1.1) rotate(0deg); }
+            50% { transform: scale(1.3) rotate(15deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+
+        .ball-target {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px dashed rgba(0, 206, 201, 0.7);
+            z-index: 15;
+            display: none;
+            transform: translate(-50%, -50%);
+        }
+
+        .ball-target::after {
+            content: '+';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .instructions {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1.5rem;
+            border-radius: 16px;
+            width: 100%;
+            text-align: center;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            backdrop-filter: blur(5px);
+        }
+
+        .level-hint {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #fdcb6e;
+            font-style: italic;
+            text-align: center;
+        }
+
+        .mouse-controls-hint {
+            margin-top: 5px;
+            font-size: 0.8rem;
+            color: #74b9ff;
+            font-style: italic;
+            text-align: center;
+        }
+
+        .ball-instructions {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #ff9ff3;
+            font-weight: bold;
+            text-align: center;
+            display: none;
+        }
+
+        .ball-warning {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 118, 117, 0.9);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 16px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-align: center;
+            z-index: 100;
+            box-shadow: 0 0 30px rgba(255, 118, 117, 0.8);
+            animation: pulseWarning 1.5s infinite;
+            display: none;
+        }
+
+        @keyframes pulseWarning {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            50% { transform: translate(-50%, -50%) scale(1.05); opacity: 0.9; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+
+        .results-container {
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .results-container::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: -20px;
+            right: -20px;
+            bottom: -20px;
+            background: radial-gradient(circle, rgba(0, 206, 201, 0.1) 0%, transparent 70%);
+            z-index: -1;
+            border-radius: 30px;
+        }
+
+        .results-title {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(to right, var(--success), var(--secondary));
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            position: relative;
+            z-index: 2;
+        }
+
+        .results-score {
+            font-size: 5rem;
+            font-weight: 800;
+            margin: 1rem 0;
+            color: var(--accent);
+            text-shadow: 0 0 20px rgba(253, 203, 110, 0.7);
+            position: relative;
+            z-index: 2;
+            animation: scorePulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes scorePulse {
+            0% { transform: scale(1); text-shadow: 0 0 20px rgba(253, 203, 110, 0.7); }
+            50% { transform: scale(1.05); text-shadow: 0 0 30px rgba(253, 203, 110, 0.9); }
+            100% { transform: scale(1); text-shadow: 0 0 20px rgba(253, 203, 110, 0.7); }
+        }
+
+        .results-subtitle {
+            font-size: 1.4rem;
+            color: white;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.4);
+            padding: 0.5rem 1.5rem;
+            border-radius: 12px;
+            display: inline-block;
+            position: relative;
+            z-index: 2;
+        }
+
+        .results-stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 2rem 0;
+            font-size: 1.2rem;
+        }
+
+        .stat-item {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem;
+            border-radius: 12px;
+            min-width: 150px;
+            backdrop-filter: blur(2px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-item div:first-child {
+            color: #b2bec3;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .rings-stack {
+            display: flex;
+            flex-direction: column-reverse;
+            position: absolute;
+            bottom: 40px;
+            align-items: center;
+            width: 300px;
+            left: 50%;
+            transform: translateX(-50%);
+            gap: 2px;
+            z-index: 5;
+        }
+
+        .controls, .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .level-description {
+            min-height: 100px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .win-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 4rem;
+            font-weight: bold;
+            color: #f1c40f;
+            text-shadow: 0 0 20px rgba(241, 196, 15, 0.8);
+            z-index: 100;
+            animation: pulseWin 1.5s infinite, float 3s ease-in-out infinite;
+            text-align: center;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 20px;
+            width: 80%;
+            max-width: 500px;
+            border: 2px solid rgba(241, 196, 15, 0.3);
+            box-shadow: 0 0 30px rgba(241, 196, 15, 0.5);
+        }
+
+        @keyframes pulseWin {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            50% { transform: translate(-50%, -50%) scale(1.05); opacity: 0.9; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+
+        @keyframes float {
+            0% { transform: translate(-50%, -50%) translateY(0); }
+            50% { transform: translate(-50%, -50%) translateY(-10px); }
+            100% { transform: translate(-50%, -50%) translateY(0); }
+        }
+
+        .leaderboard-container {
+            margin: 2rem 0;
+            overflow-x: auto;
+        }
+
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            overflow: hidden;
+            backdrop-filter: blur(5px);
+        }
+
+        .leaderboard-table th, .leaderboard-table td {
+            padding: 1rem;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .leaderboard-table th {
+            background: rgba(108, 92, 231, 0.3);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .leaderboard-table tr:nth-child(even) {
+            background: rgba(0, 0, 0, 0.15);
+        }
+
+        .leaderboard-table tr:hover {
+            background: rgba(0, 206, 201, 0.15);
+            transform: scale(1.01);
+            transition: transform 0.2s ease;
+        }
+
+        .level-highscore {
+            color: #f1c40f;
+            font-weight: bold;
+        }
+
+        .keyboard-hint {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            font-size: 10px;
+            color: #b2bec3;
+        }
+
+        .ring-placed {
+            animation: ringPlace 0.3s ease-out;
+        }
+
+        @keyframes ringPlace {
+            0% { transform: scale(0.8); opacity: 0.5; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .mouse-click-effect {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.7);
+            pointer-events: none;
+            z-index: 200;
+            transform: translate(-50%, -50%) scale(0);
+            animation: clickEffect 0.6s ease-out;
+        }
+
+        @keyframes clickEffect {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 0.7; }
+            100% { transform: translate(-50%, -50%) scale(3); opacity: 0; }
+        }
+
+        .speed-warning {
+            position: absolute;
+            padding: 0.5rem;
+            background: rgba(255, 118, 117, 0.8);
+            color: white;
+            border-radius: 8px;
+            font-weight: bold;
+            z-index: 100;
+            animation: fadeOut 1s forwards;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            to { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+        }
+
+        @media (max-width: 768px) {
+            .screen {
+                padding: 1.5rem;
+            }
+            
+            .logo h1 {
+                font-size: 2.5rem;
+            }
+            
+            .levels-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .game-area {
+                height: 350px;
+            }
+            
+            .game-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .win-message {
+                font-size: 2.5rem;
+                padding: 0.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .btn {
+                min-width: 140px;
+                padding: 0.8rem 1.5rem;
+                font-size: 1rem;
+            }
+            
+            .logo h1 {
+                font-size: 2rem;
+            }
+            
+            .game-area {
+                height: 300px;
+            }
+            
+            .win-message {
+                font-size: 2rem;
+            }
+            
+            .floating-ring {
+                font-size: 12px;
+                padding: 0 5px;
+            }
+            
+            .results-score {
+                font-size: 3.5rem;
+            }
+        }
+    </style>
 </head>
-
 <body>
-  <header>
-    <div class="hk-logo" role="img" aria-label="Логотип — амулет Hollow Knight" title="HK Amulets">
-      <i class="horn left" aria-hidden="true"></i>
-      <i class="horn right" aria-hidden="true"></i>
-      <i class="crest" aria-hidden="true"></i>
-      <i class="eye left" aria-hidden="true"></i>
-      <i class="eye right" aria-hidden="true"></i>
-      <i class="mask" aria-hidden="true"></i>
-      <i class="glow" aria-hidden="true"></i>
-      <i class="spark spark1" aria-hidden="true"></i>
-      <i class="spark spark2" aria-hidden="true"></i>
-      <i class="spark spark3" aria-hidden="true"></i>
+    <div class="screen auth-screen active">
+        <div class="logo">
+            <h1>ПИРАМИДА</h1>
+            <p>Собери идеальную пирамиду из колец и стань чемпионом!</p>
+        </div>
+        <div class="input-group">
+            <label for="player-name">Введите ваше имя</label>
+            <input type="text" id="player-name" placeholder="Ваше игровое имя" maxlength="15">
+        </div>
+        <div class="controls">
+            <button id="start-btn" class="btn btn-large">Начать игру</button>
+        </div>
     </div>
-    <button class="burger" aria-label="Меню">
-      <span></span><span></span><span></span>
-    </button>
-    <nav>
-      <ul>
-        <li><a href="index.html">Главная</a></li>
-        <li><a href="amulets.html">Амулеты</a></li>
-        <li><a href="tasks.html">Задания</a></li>
-      </ul>
-    </nav>
-  </header>
 
-  <main class="content">
-    <section class="intro">
-      <h1>Мир Hollow Knight</h1>
-      <p>
-        Добро пожаловать в подземное королевство Hallownest. Этот сайт посвящён
-        магическим амулетам, усиливающим способности рыцаря, а также хранит мои учебные
-        задания по дисциплине «Верстка и прототипирование сайтов».
-      </p>
-      <a href="amulets.html" class="btn">Перейти к амулетам</a>
-    </section>
-  </main>
+    <div class="screen level-select-screen">
+        <div class="logo">
+            <h1>ВЫБЕРИ УРОВЕНЬ</h1>
+            <p>Каждый уровень сложнее предыдущего. Докажи свои навыки!</p>
+        </div>
+        
+        <div class="levels-container">
+            <div class="level-card" data-level="1">
+                <h2>Уровень 1</h2>
+                <p class="level-description">Кликай на кольца в порядке убывания размера. Собери идеальную пирамиду!</p>
+                <button class="btn btn-secondary">Играть</button>
+                <div class="keyboard-hint">Клавиша 1</div>
+            </div>
+            
+            <div class="level-card locked" data-level="2">
+                <h2>Уровень 2</h2>
+                <p class="level-description">Кольцо меняет размер автоматически. Поймай нужный размер вовремя!</p>
+                <button class="btn btn-secondary" disabled>Заблокировано</button>
+                <div class="keyboard-hint">Клавиша 2</div>
+            </div>
+            
+            <div class="level-card locked" data-level="3">
+                <h2>Уровень 3</h2>
+                <p class="level-description">Кольцо растет только по нажатию Space. Точность решает всё!</p>
+                <button class="btn btn-secondary" disabled>Заблокировано</button>
+                <div class="keyboard-hint">Клавиша 3</div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button id="leaderboard-btn" class="btn btn-leaderboard">🏆 Таблица рекордов</button>
+            <button id="back-btn" class="btn">← Вернуться</button>
+        </div>
+    </div>
 
-  <footer>
-    <p>© 2025 Viktor | Верстка и прототипирование сайтов</p>
-  </footer>
+    <div class="screen game-screen">
+        <div class="game-header">
+            <div class="timer">
+                <span>⏱️</span>
+                <span id="timer-display">45</span>
+            </div>
+            <div class="score">
+                <span>⭐</span>
+                <span id="score-display">0</span>
+            </div>
+            <div class="remaining" id="remaining-display" style="display: none;">
+                Осталось: <span id="remaining-count">6</span>
+            </div>
+        </div>
+        
+        <div class="game-area" id="game-area">
+            <div class="rod"></div>
+            <div class="base"></div>
+            <div class="source-area" id="source-area"></div>
+            <div class="rings-stack" id="rings-stack"></div>
+            <div class="floating-ring" id="floating-ring" style="width: 80px; display: none;">Нажми</div>
+            <div class="ball" id="ball"></div>
+            <div class="ball-target" id="ball-target"></div>
+            <div class="ball-warning" id="ball-warning"></div>
+        </div>
+        
+        <div class="instructions" id="level-instructions">
+            Кликай на кольца в порядке убывания размера, чтобы собрать пирамиду!
+        </div>
+        <div class="level-hint" id="level-hint"></div>
+        <div class="mouse-controls-hint" id="mouse-controls-hint"></div>
+        <div class="ball-instructions" id="ball-instructions"></div>
+        
+        <div class="controls">
+            <button id="restart-level-btn" class="btn">🔄 Перезапустить</button>
+            <button id="exit-level-btn" class="btn">🚪 Выйти</button>
+        </div>
+    </div>
 
-  <div class="overlay"></div>
+    <div class="screen results-screen">
+        <div class="results-container">
+            <h2 class="results-title" id="result-title">Уровень пройден!</h2>
+            <div class="results-score" id="final-score">150</div>
+            <div class="results-subtitle" id="score-formula">
+                (Очки × Оставшееся время)
+            </div>
+            
+            <div class="results-stats">
+                <div class="stat-item">
+                    <div>Колец собрано</div>
+                    <div id="rings-collected">6</div>
+                </div>
+                <div class="stat-item">
+                    <div>Времени осталось</div>
+                    <div id="time-left">42 сек</div>
+                </div>
+            </div>
+            
+            <div class="btn-group">
+                <button id="next-level-btn" class="btn btn-large" style="display: none;">Следующий уровень</button>
+                <button id="retry-level-btn" class="btn btn-large">🔄 Повторить уровень</button>
+                <button id="levels-btn" class="btn">К выбору уровней</button>
+            </div>
+        </div>
+    </div>
 
-  <script src="js/navigation.js"></script>
-  <script src="js/script.js"></script>
+    <div class="screen leaderboard-screen">
+        <div class="logo">
+            <h1>ТАБЛИЦА РЕКОРДОВ</h1>
+            <p>Лучшие результаты игроков по уровням</p>
+        </div>
+        
+        <div class="leaderboard-container">
+            <table class="leaderboard-table">
+                <thead>
+                    <tr>
+                        <th>Игрок</th>
+                        <th>Уровень 1</th>
+                        <th>Уровень 2</th>
+                        <th>Уровень 3</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboard-body">
+                    <!-- populated by JS -->
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="controls">
+            <button id="back-to-levels-btn" class="btn">← К выбору уровней</button>
+        </div>
+    </div>
+
+    <script>
+        // Game state variables
+        let gameState = {
+            currentPlayer: null,
+            currentLevel: 1,
+            levelUnlocked: [true, false, false],
+            score: 0,
+            timer: 45,
+            timerInterval: null,
+            ringsOnRod: [],
+            sourceRings: [],
+            currentRingIndex: 0,
+            targetSizes: [],
+            tolerance: 8,
+            floatingRingSize: 80,
+            floatingRingDirection: 1,
+            isSpaceControlled: false,
+            gameActive: false,
+            ringCount: 6, // Minimum 6 rings
+            winMessageShown: false,
+            finalScore: 0,
+            lastMousePosition: { x: 0, y: 0 },
+            ball: {
+                active: false,
+                x: 0,
+                y: 0,
+                vx: 0,
+                vy: 0,
+                radius: 20, // Increased from 15 to 20
+                dragging: false,
+                offsetX: 0,
+                offsetY: 0,
+                lastX: 0,
+                lastY: 0,
+                lastUpdateTime: 0,
+                speedWarning: false,
+                resistance: 0.2, // Slight resistance when dragging
+                maxSpeed: 150, // Max speed in pixels per second
+                escapeThreshold: 200, // Speed threshold to escape from mouse
+                escapeCooldown: 0
+            },
+            ballTarget: {
+                x: 0,
+                y: 0,
+                radius: 25 // Increased from 20 to 25
+            },
+            ballInterval: null,
+            ballDragStart: null,
+            ballWarningTimeout: null
+        };
+
+        // DOM Elements
+        const screens = {
+            auth: document.querySelector('.auth-screen'),
+            levelSelect: document.querySelector('.level-select-screen'),
+            game: document.querySelector('.game-screen'),
+            results: document.querySelector('.results-screen'),
+            leaderboard: document.querySelector('.leaderboard-screen')
+        };
+
+        const elements = {
+            playerNameInput: document.getElementById('player-name'),
+            startBtn: document.getElementById('start-btn'),
+            levelCards: document.querySelectorAll('.level-card'),
+            backBtn: document.getElementById('back-btn'),
+            timerDisplay: document.getElementById('timer-display'),
+            scoreDisplay: document.getElementById('score-display'),
+            remainingDisplay: document.getElementById('remaining-display'),
+            remainingCount: document.getElementById('remaining-count'),
+            sourceArea: document.getElementById('source-area'),
+            ringsStack: document.getElementById('rings-stack'),
+            floatingRing: document.getElementById('floating-ring'),
+            levelInstructions: document.getElementById('level-instructions'),
+            levelHint: document.getElementById('level-hint'),
+            mouseControlsHint: document.getElementById('mouse-controls-hint'),
+            ballInstructions: document.getElementById('ball-instructions'),
+            gameArea: document.getElementById('game-area'),
+            ball: document.getElementById('ball'),
+            ballTarget: document.getElementById('ball-target'),
+            ballWarning: document.getElementById('ball-warning'),
+            restartLevelBtn: document.getElementById('restart-level-btn'),
+            exitLevelBtn: document.getElementById('exit-level-btn'),
+            resultTitle: document.getElementById('result-title'),
+            finalScore: document.getElementById('final-score'),
+            scoreFormula: document.getElementById('score-formula'),
+            ringsCollected: document.getElementById('rings-collected'),
+            timeLeft: document.getElementById('time-left'),
+            nextLevelBtn: document.getElementById('next-level-btn'),
+            retryLevelBtn: document.getElementById('retry-level-btn'),
+            levelsBtn: document.getElementById('levels-btn'),
+            leaderboardBtn: document.getElementById('leaderboard-btn'),
+            backToLevelsBtn: document.getElementById('back-to-levels-btn'),
+            leaderboardBody: document.getElementById('leaderboard-body')
+        };
+
+        // Event Listeners
+        elements.startBtn.addEventListener('click', startGame);
+        elements.playerNameInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                startGame();
+            }
+        });
+        elements.backBtn.addEventListener('click', backToAuth);
+        elements.restartLevelBtn.addEventListener('click', restartLevel);
+        elements.exitLevelBtn.addEventListener('click', showLevelSelect);
+        elements.retryLevelBtn.addEventListener('click', restartLevel);
+        elements.levelsBtn.addEventListener('click', showLevelSelect);
+        elements.nextLevelBtn.addEventListener('click', nextLevel);
+        elements.leaderboardBtn.addEventListener('click', showLeaderboard);
+        elements.backToLevelsBtn.addEventListener('click', showLevelSelect);
+        elements.floatingRing.addEventListener('click', () => {
+            if (gameState.gameActive && (gameState.currentLevel === 2 || gameState.currentLevel === 3)) {
+                captureFloatingRing();
+            }
+        });
+
+        // Game area mouse controls
+        elements.gameArea.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+        });
+
+        elements.gameArea.addEventListener('mousedown', (e) => {
+            if (gameState.gameActive && gameState.currentLevel === 3) {
+                gameState.lastMousePosition = { x: e.clientX, y: e.clientY };
+                
+                if (e.button === 2) { // Right mouse button
+                    e.preventDefault();
+                    createClickEffect(e.clientX, e.clientY, '#00b894');
+                    increaseFloatingRing();
+                } else if (e.button === 0) { // Left mouse button
+                    createClickEffect(e.clientX, e.clientY, '#ff7675');
+                    captureFloatingRing();
+                }
+            }
+            
+            // Ball dragging
+            if (gameState.gameActive && gameState.currentLevel === 1 && gameState.ball.active && !gameState.ball.dragging) {
+                const ballRect = elements.ball.getBoundingClientRect();
+                const gameAreaRect = elements.gameArea.getBoundingClientRect();
+                const mouseX = e.clientX - gameAreaRect.left;
+                const mouseY = e.clientY - gameAreaRect.top;
+                
+                const ballCenterX = ballRect.left + ballRect.width/2 - gameAreaRect.left;
+                const ballCenterY = ballRect.top + ballRect.height/2 - gameAreaRect.top;
+                
+                const distance = Math.sqrt(Math.pow(mouseX - ballCenterX, 2) + Math.pow(mouseY - ballCenterY, 2));
+                
+                if (distance <= gameState.ball.radius) {
+                    e.preventDefault();
+                    startBallDrag(e, gameAreaRect);
+                }
+            }
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (gameState.ball.dragging) {
+                continueBallDrag(e);
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (gameState.ball.dragging) {
+                endBallDrag();
+            }
+        });
+
+        // Level card click handlers
+        elements.levelCards.forEach(card => {
+            card.addEventListener('click', () => {
+                const level = parseInt(card.dataset.level);
+                if (gameState.levelUnlocked[level - 1] || gameState.currentPlayer === 'debug') {
+                    startLevel(level);
+                }
+            });
+        });
+
+        // Space key handler for level 3
+        document.addEventListener('keydown', (e) => {
+            // Debug level access with number keys
+            if (screens.levelSelect.classList.contains('active')) {
+                if (e.key === '1') startLevel(1);
+                if (e.key === '2') startLevel(2);
+                if (e.key === '3') startLevel(3);
+            }
+            
+            if (gameState.gameActive && gameState.currentLevel === 3 && e.code === 'Space') {
+                e.preventDefault();
+                createKeyPressEffect('Space', '#00b894');
+                increaseFloatingRing();
+            }
+            
+            // For level 2 and 3, allow Enter to capture ring
+            if (gameState.gameActive && (gameState.currentLevel === 2 || gameState.currentLevel === 3) && e.key === 'Enter') {
+                e.preventDefault();
+                createKeyPressEffect('Enter', '#ff7675');
+                captureFloatingRing();
+            }
+        });
+
+        // Initialize level animations
+        function initLevelAnimations() {
+            setInterval(() => {
+                if (gameState.gameActive && gameState.currentLevel === 2) {
+                    updateFloatingRing();
+                }
+            }, 50);
+        }
+
+        // Ball Functions
+        function showBallWarning(message, duration = 3000) {
+            elements.ballWarning.textContent = message;
+            elements.ballWarning.style.display = 'block';
+            
+            clearTimeout(gameState.ballWarningTimeout);
+            gameState.ballWarningTimeout = setTimeout(() => {
+                elements.ballWarning.style.display = 'none';
+            }, duration);
+        }
+
+        function prepareBallSpawn() {
+            showBallWarning("ГОТОВЬСЯ! Скоро появится шарик...", 3000);
+            
+            setTimeout(() => {
+                spawnBall();
+            }, 3000);
+        }
+
+        function spawnBall() {
+            if (gameState.ball.active || !gameState.gameActive || gameState.currentLevel !== 1) return;
+            
+            clearInterval(gameState.ballInterval);
+            gameState.ball.active = true;
+            
+            // Clear any existing warnings
+            elements.ballWarning.style.display = 'none';
+            
+            // Calculate the top of the pyramid
+            const pyramidTopY = 400 - (24 * gameState.ringCount + 40);
+            const pyramidTopX = elements.gameArea.offsetWidth / 2;
+            
+            // Set ball target position (top of pyramid)
+            gameState.ballTarget.x = pyramidTopX;
+            gameState.ballTarget.y = pyramidTopY - 30;
+            elements.ballTarget.style.left = `${gameState.ballTarget.x}px`;
+            elements.ballTarget.style.top = `${gameState.ballTarget.y}px`;
+            elements.ballTarget.style.display = 'block';
+            
+            // Show ball instructions
+            elements.ballInstructions.textContent = 'Аккуратно перетащи шарик на вершину пирамиды! Слишком быстрое движение - шарик соскользнет!';
+            elements.ballInstructions.style.display = 'block';
+            
+            // Spawn ball at random position around pyramid top (100px radius), but only in the upper 3/4 circle
+            // Exclude the bottom quarter (from 180° to 360°)
+            const angle = Math.random() * Math.PI * 1.5; // 0 to 270 degrees (0 to 3π/2)
+            const distance = 100 + Math.random() * 50;
+            gameState.ball.x = pyramidTopX + Math.cos(angle) * distance;
+            gameState.ball.y = pyramidTopY + Math.sin(angle) * distance;
+            
+            // Set initial velocity away from pyramid
+            const dx = gameState.ball.x - pyramidTopX;
+            const dy = gameState.ball.y - pyramidTopY;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            gameState.ball.vx = (dx / dist) * 0.8;
+            gameState.ball.vy = (dy / dist) * 0.8;
+            
+            // Render initial position
+            updateBallPosition();
+            
+            // Start ball animation
+            gameState.ballInterval = setInterval(updateBall, 30);
+        }
+
+        function updateBall() {
+            if (!gameState.ball.active || gameState.ball.dragging) return;
+            
+            // Update position
+            gameState.ball.x += gameState.ball.vx;
+            gameState.ball.y += gameState.ball.vy;
+            
+            // Check if ball is out of bounds
+            const gameAreaRect = elements.gameArea.getBoundingClientRect();
+            const ballLeft = gameState.ball.x - gameState.ball.radius;
+            const ballRight = gameState.ball.x + gameState.ball.radius;
+            const ballTop = gameState.ball.y - gameState.ball.radius;
+            const ballBottom = gameState.ball.y + gameState.ball.radius;
+            
+            if (ballLeft < 0 || ballRight > gameAreaRect.width || ballTop < 0 || ballBottom > gameAreaRect.height) {
+                ballOutOfBounds();
+                return;
+            }
+            
+            // Check if ball reached target
+            const dx = gameState.ball.x - gameState.ballTarget.x;
+            const dy = gameState.ball.y - gameState.ballTarget.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (distance < gameState.ballTarget.radius + gameState.ball.radius) {
+                ballReachedTarget();
+                return;
+            }
+            
+            updateBallPosition();
+        }
+
+        function updateBallPosition() {
+            elements.ball.style.left = `${gameState.ball.x - gameState.ball.radius}px`;
+            elements.ball.style.top = `${gameState.ball.y - gameState.ball.radius}px`;
+            elements.ball.style.display = 'block';
+        }
+
+        function startBallDrag(e, gameAreaRect) {
+            // Check if we're in cooldown period after escape
+            if (gameState.ball.escapeCooldown > 0) {
+                showSpeedWarning(gameState.ball.x, gameState.ball.y, 'Подожди немного перед повторным захватом!');
+                return;
+            }
+            
+            gameState.ball.dragging = true;
+            elements.ball.classList.add('dragging');
+            elements.ball.classList.remove('escaped');
+            
+            gameState.ballDragStart = {
+                x: gameState.ball.x,
+                y: gameState.ball.y
+            };
+            
+            const mouseX = e.clientX - gameAreaRect.left;
+            const mouseY = e.clientY - gameAreaRect.top;
+            
+            gameState.ball.offsetX = mouseX - gameState.ball.x;
+            gameState.ball.offsetY = mouseY - gameState.ball.y;
+            gameState.ball.lastX = gameState.ball.x;
+            gameState.ball.lastY = gameState.ball.y;
+            gameState.ball.lastUpdateTime = Date.now();
+            
+            // Stop automatic movement while dragging
+            gameState.ball.vx = 0;
+            gameState.ball.vy = 0;
+        }
+
+        function continueBallDrag(e) {
+            if (!gameState.ball.dragging) return;
+            
+            let gameAreaRect = elements.gameArea.getBoundingClientRect();
+            const mouseX = e.clientX - gameAreaRect.left;
+            const mouseY = e.clientY - gameAreaRect.top;
+            
+            // Calculate desired position
+            const desiredX = mouseX - gameState.ball.offsetX;
+            const desiredY = mouseY - gameState.ball.offsetY;
+            
+            // Apply resistance - move ball towards desired position with damping
+            gameState.ball.x += (desiredX - gameState.ball.x) * gameState.ball.resistance;
+            gameState.ball.y += (desiredY - gameState.ball.y) * gameState.ball.resistance;
+            
+            // Check speed
+            const now = Date.now();
+            const deltaTime = now - gameState.ball.lastUpdateTime;
+            if (deltaTime > 50) { // Check speed every 50ms
+                const dx = gameState.ball.x - gameState.ball.lastX;
+                const dy = gameState.ball.y - gameState.ball.lastY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                const speed = distance / (deltaTime / 1000); // pixels per second
+                
+                // If speed is too high, show warning
+                if (speed > gameState.ball.maxSpeed && !gameState.ball.speedWarning) {
+                    gameState.ball.speedWarning = true;
+                    showSpeedWarning(gameState.ball.x, gameState.ball.y, 'Слишком быстро!');
+                    
+                    setTimeout(() => {
+                        if (gameState.ball.dragging) {
+                            gameState.ball.speedWarning = false;
+                        }
+                    }, 1000);
+                }
+                
+                // If speed exceeds escape threshold, release the ball
+                if (speed > gameState.ball.escapeThreshold) {
+                    ballEscaped();
+                    return;
+                }
+                
+                gameState.ball.lastX = gameState.ball.x;
+                gameState.ball.lastY = gameState.ball.y;
+                gameState.ball.lastUpdateTime = now;
+            }
+            
+            // Check boundaries
+            gameAreaRect = elements.gameArea.getBoundingClientRect();
+            if (gameState.ball.x - gameState.ball.radius < 0) gameState.ball.x = gameState.ball.radius;
+            if (gameState.ball.x + gameState.ball.radius > gameAreaRect.width) gameState.ball.x = gameAreaRect.width - gameState.ball.radius;
+            if (gameState.ball.y - gameState.ball.radius < 0) gameState.ball.y = gameState.ball.radius;
+            if (gameState.ball.y + gameState.ball.radius > gameAreaRect.height) gameState.ball.y = gameAreaRect.height - gameState.ball.radius;
+            
+            updateBallPosition();
+        }
+
+        function endBallDrag() {
+            if (!gameState.ball.dragging) return;
+            
+            gameState.ball.dragging = false;
+            elements.ball.classList.remove('dragging');
+            gameState.ball.speedWarning = false;
+            
+            // Resume automatic movement away from pyramid
+            const pyramidTopX = elements.gameArea.offsetWidth / 2;
+            const pyramidTopY = 400 - (24 * gameState.ringCount + 40);
+            
+            const dx = gameState.ball.x - pyramidTopX;
+            const dy = gameState.ball.y - pyramidTopY;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            
+            if (dist > 0) {
+                gameState.ball.vx = (dx / dist) * 0.8;
+                gameState.ball.vy = (dy / dist) * 0.8;
+            }
+        }
+
+        function ballEscaped() {
+            gameState.ball.dragging = false;
+            elements.ball.classList.remove('dragging');
+            elements.ball.classList.add('escaped');
+            gameState.ball.speedWarning = false;
+            
+            // Create escape effect
+            createClickEffect(
+                gameState.ball.x + elements.gameArea.getBoundingClientRect().left,
+                gameState.ball.y + elements.gameArea.getBoundingClientRect().top,
+                '#ff7675'
+            );
+            
+            // Set cooldown period
+            gameState.ball.escapeCooldown = 2; // seconds
+            const cooldownInterval = setInterval(() => {
+                gameState.ball.escapeCooldown--;
+                if (gameState.ball.escapeCooldown <= 0) {
+                    clearInterval(cooldownInterval);
+                    gameState.ball.escapeCooldown = 0;
+                }
+            }, 1000);
+            
+            // Show warning
+            showSpeedWarning(gameState.ball.x, gameState.ball.y, 'Шарик вырвался! Попробуй еще раз.');
+            
+            // After escape, set velocity away from pyramid top (center)
+            const pyramidTopY = 400 - (24 * gameState.ringCount + 40);
+            const pyramidTopX = elements.gameArea.offsetWidth / 2;
+            
+            const dx = gameState.ball.x - pyramidTopX;
+            const dy = gameState.ball.y - pyramidTopY;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            
+            if (dist > 0) {
+                gameState.ball.vx = (dx / dist) * 2.5; // Faster escape speed away from pyramid
+                gameState.ball.vy = (dy / dist) * 2.5;
+            }
+        }
+
+        function showSpeedWarning(x, y, message = 'Слишком быстро! Шарик может соскользнуть') {
+            const warning = document.createElement('div');
+            warning.className = 'speed-warning';
+            warning.textContent = message;
+            warning.style.left = `${x}px`;
+            warning.style.top = `${y - 30}px`;
+            elements.gameArea.appendChild(warning);
+            
+            setTimeout(() => {
+                if (warning.parentNode) {
+                    warning.remove();
+                }
+            }, 1500);
+        }
+
+        function ballSlipped() {
+            clearInterval(gameState.ballInterval);
+            gameState.ball.active = false;
+            
+            // Create dramatic effect
+            elements.ball.style.transform = 'scale(1.5)';
+            elements.ball.style.opacity = '0.5';
+            elements.ball.style.boxShadow = '0 0 30px rgba(255, 118, 117, 0.8)';
+            
+            setTimeout(() => {
+                // Hide ball and target
+                elements.ball.style.display = 'none';
+                elements.ballTarget.style.display = 'none';
+                elements.ballInstructions.style.display = 'none';
+                
+                // Show message
+                showMessage('Шарик соскользнул! Бонусные очки не получены.', 'error');
+                
+                // Complete level without bonus points
+                setTimeout(() => {
+                    showWinMessage();
+                }, 1500);
+            }, 800);
+        }
+
+        function ballOutOfBounds() {
+            clearInterval(gameState.ballInterval);
+            gameState.ball.active = false;
+            elements.ball.style.display = 'none';
+            elements.ballTarget.style.display = 'none';
+            elements.ballInstructions.style.display = 'none';
+            
+            showMessage('Шарик улетел! Бонусные очки не получены.', 'error');
+            
+            // Complete level without bonus points
+            setTimeout(() => {
+                showWinMessage();
+            }, 1500);
+        }
+
+        function ballReachedTarget() {
+            clearInterval(gameState.ballInterval);
+            gameState.ball.active = false;
+            elements.ball.style.display = 'none';
+            elements.ballTarget.style.display = 'none';
+            elements.ballInstructions.style.display = 'none';
+            
+            // Add bonus points
+            const bonusPoints = 200;
+            gameState.score += bonusPoints;
+            updateScore();
+            
+            showMessage(`+${bonusPoints} бонусных очков!`, 'success');
+            
+            // Small delay before showing win message
+            setTimeout(() => {
+                showWinMessage();
+            }, 1000);
+        }
+
+        // Game Functions
+        function startGame() {
+            const playerName = elements.playerNameInput.value.trim() || 'Player';
+            gameState.currentPlayer = playerName;
+            showLevelSelect();
+            loadLeaderboard();
+        }
+
+        function backToAuth() {
+            hideAllScreens();
+            screens.auth.classList.add('active');
+        }
+
+        function showLevelSelect() {
+            hideAllScreens();
+            screens.levelSelect.classList.add('active');
+            
+            // Update level card locks
+            elements.levelCards.forEach((card, index) => {
+                const level = index + 1;
+                const isUnlocked = gameState.levelUnlocked[index] || gameState.currentPlayer === 'debug';
+                
+                if (isUnlocked) {
+                    card.classList.remove('locked');
+                    card.querySelector('button').disabled = false;
+                    card.querySelector('button').textContent = 'Играть';
+                } else {
+                    card.classList.add('locked');
+                    card.querySelector('button').disabled = true;
+                    card.querySelector('button').textContent = 'Заблокировано';
+                }
+            });
+        }
+
+        function startLevel(level) {
+            // Clear any existing win messages
+            clearWinMessage();
+            // Clear any ball state
+            clearBallState();
+            
+            hideAllScreens();
+            screens.game.classList.add('active');
+            
+            gameState.currentLevel = level;
+            gameState.score = 0;
+            gameState.timer = 45;
+            gameState.ringsOnRod = [];
+            gameState.currentRingIndex = 0;
+            gameState.floatingRingSize = 80;
+            gameState.floatingRingDirection = 1;
+            gameState.isSpaceControlled = false;
+            gameState.gameActive = true;
+            gameState.winMessageShown = false;
+            gameState.ringCount = Math.floor(Math.random() * 3) + 6; // 6-8 rings
+            
+            // Clear any existing intervals
+            clearInterval(gameState.timerInterval);
+            clearInterval(gameState.ballInterval);
+            
+            updateScore();
+            startTimer();
+            renderRingsStack();
+            
+            // Show remaining rings display for levels 2 and 3
+            if (level === 1) {
+                elements.remainingDisplay.style.display = 'none';
+                elements.levelHint.textContent = '';
+                elements.mouseControlsHint.textContent = '';
+                elements.ballInstructions.style.display = 'none';
+                generateLevel1Rings();
+                elements.levelInstructions.textContent = 'Кликай на кольца в порядке убывания размера, чтобы собрать пирамиду!';
+                elements.floatingRing.style.display = 'none';
+                elements.sourceArea.style.display = 'flex';
+            } else {
+                elements.remainingDisplay.style.display = 'flex';
+                updateRemainingRings();
+                generateTargetSizes();
+                
+                if (level === 2) {
+                    elements.levelInstructions.textContent = 'Нажмите на кольцо (или Enter), когда оно будет нужного размера! Точность: ±8px';
+                    elements.levelHint.textContent = '';
+                    elements.mouseControlsHint.textContent = '';
+                    elements.floatingRing.style.display = 'flex';
+                    elements.floatingRing.textContent = 'Нажми';
+                    elements.sourceArea.style.display = 'none';
+                } else if (level === 3) {
+                    elements.levelInstructions.textContent = 'Нажмите Enter, левую кнопку мыши, или кликните по кольцу для фиксации размера!';
+                    elements.levelHint.textContent = 'Нажимайте клавишу Space или правую кнопку мыши для увеличения размера кольца';
+                    elements.mouseControlsHint.textContent = 'Левая кнопка мыши: зафиксировать размер | Правая кнопка мыши: увеличить размер';
+                    elements.floatingRing.style.display = 'flex';
+                    elements.floatingRing.textContent = 'ЛКМ / Enter';
+                    elements.sourceArea.style.display = 'none';
+                    gameState.isSpaceControlled = true;
+                }
+                renderFloatingRing();
+            }
+        }
+
+        function generateLevel1Rings() {
+            // Clear existing rings
+            elements.sourceArea.innerHTML = '';
+            elements.ringsStack.innerHTML = '';
+            
+            // Generate random ring sizes (100-180px) in descending order
+            const sizes = [];
+            let lastSize = 180;
+            for (let i = 0; i < gameState.ringCount; i++) {
+                const size = lastSize - Math.floor(Math.random() * 15) - 10;
+                sizes.push(size);
+                lastSize = size;
+            }
+            
+            // Shuffle the rings for source area
+            gameState.sourceRings = shuffleArray(sizes.map((size, index) => ({
+                id: index + 1,
+                size: size,
+                color: getRandomGradient(),
+                placed: false
+            })));
+            
+            // Render source rings
+            gameState.sourceRings.forEach(ring => {
+                const ringEl = document.createElement('div');
+                ringEl.className = 'ring';
+                ringEl.style.width = `${ring.size}px`;
+                ringEl.style.background = ring.color;
+                ringEl.dataset.id = ring.id;
+                ringEl.textContent = `${ring.size}`;
+                ringEl.addEventListener('click', () => handleRingClick(ring.id));
+                elements.sourceArea.appendChild(ringEl);
+            });
+        }
+
+        function generateTargetSizes() {
+            // Clear existing rings
+            elements.ringsStack.innerHTML = '';
+            
+            // Generate target sizes in descending order
+            gameState.targetSizes = [];
+            let lastSize = 180;
+            for (let i = 0; i < gameState.ringCount; i++) {
+                const size = lastSize - Math.floor(Math.random() * 15) - 10;
+                gameState.targetSizes.push(size);
+                lastSize = size;
+            }
+            
+            gameState.currentRingIndex = 0;
+            updateRemainingRings();
+        }
+
+        function handleRingClick(ringId) {
+            if (!gameState.gameActive) return;
+            
+            const ring = gameState.sourceRings.find(r => r.id === ringId);
+            if (!ring || ring.placed) return;
+            
+            // Check if this is the correct next ring (largest available)
+            const availableRings = gameState.sourceRings.filter(r => !r.placed);
+            const largestRing = availableRings.reduce((max, r) => r.size > max.size ? r : max);
+            
+            if (ring.id === largestRing.id) {
+                // Correct ring selected
+                placeRingOnRod(ring);
+                ring.placed = true;
+                
+                // Update visual
+                const ringEl = elements.sourceArea.querySelector(`[data-id="${ringId}"]`);
+                ringEl.style.opacity = '0.5';
+                ringEl.style.cursor = 'not-allowed';
+                
+                // Add points
+                gameState.score += 100;
+                updateScore();
+                
+                // Check if level complete
+                if (gameState.ringsOnRod.length === gameState.ringCount) {
+                    if (gameState.currentLevel === 1) {
+                        // For level 1, show warning then spawn the ball
+                        prepareBallSpawn();
+                    } else {
+                        showWinMessage();
+                    }
+                }
+            } else {
+                // Wrong ring selected - reset level
+                showMessage('Неверный порядок! Начни с самого большого кольца.', 'error');
+                setTimeout(restartLevel, 1500);
+            }
+        }
+
+        function placeRingOnRod(ring) {
+            gameState.ringsOnRod.push(ring);
+            
+            // Create visual ring element
+            const ringEl = document.createElement('div');
+            ringEl.className = 'ring ring-placed';
+            ringEl.style.width = `${ring.size}px`;
+            ringEl.style.background = ring.color;
+            ringEl.style.marginBottom = '2px';
+            ringEl.textContent = `${ring.size}`;
+            
+            // Append to stack (largest at bottom, smallest at top)
+            elements.ringsStack.appendChild(ringEl);
+        }
+
+        function renderRingsStack() {
+            elements.ringsStack.innerHTML = '';
+            gameState.ringsOnRod.forEach(ring => {
+                const ringEl = document.createElement('div');
+                ringEl.className = 'ring';
+                ringEl.style.width = `${ring.size}px`;
+                ringEl.style.background = ring.color;
+                ringEl.style.marginBottom = '2px';
+                ringEl.textContent = `${ring.size}`;
+                elements.ringsStack.appendChild(ringEl);
+            });
+        }
+
+        function updateFloatingRing() {
+            if (!gameState.gameActive) return;
+            
+            // Level 2: automatic size change
+            gameState.floatingRingSize += 2 * gameState.floatingRingDirection;
+            
+            // Reverse direction at boundaries
+            if (gameState.floatingRingSize > 180 || gameState.floatingRingSize < 40) {
+                gameState.floatingRingDirection *= -1;
+            }
+            
+            renderFloatingRing();
+        }
+
+        function renderFloatingRing() {
+            elements.floatingRing.style.width = `${gameState.floatingRingSize}px`;
+            
+            // For level 3, hide text when ring is too small
+            if (gameState.currentLevel === 3 && gameState.floatingRingSize < 60) {
+                elements.floatingRing.textContent = '';
+            } else {
+                // Visual feedback for target size
+                if (gameState.currentRingIndex < gameState.targetSizes.length) {
+                    const targetSize = gameState.targetSizes[gameState.currentRingIndex];
+                    const diff = Math.abs(gameState.floatingRingSize - targetSize);
+                    
+                    if (diff <= gameState.tolerance) {
+                        elements.floatingRing.style.background = 'linear-gradient(45deg, #00b894, #55efc4)';
+                        elements.floatingRing.textContent = gameState.currentLevel === 3 ? 'Идеально! ЛКМ' : 'Идеально!';
+                    } else if (diff <= gameState.tolerance * 2) {
+                        elements.floatingRing.style.background = 'linear-gradient(45deg, #fdcb6e, #e17055)';
+                        elements.floatingRing.textContent = gameState.currentLevel === 3 ? 'Близко! ЛКМ' : 'Близко!';
+                    } else {
+                        elements.floatingRing.style.background = 'linear-gradient(45deg, #ff7675, #fd79a8)';
+                        elements.floatingRing.textContent = gameState.currentLevel === 3 ? 'ЛКМ / Enter' : 'Нажми';
+                    }
+                }
+            }
+        }
+
+        function increaseFloatingRing() {
+            if (!gameState.gameActive || !gameState.isSpaceControlled) return;
+            
+            gameState.floatingRingSize += 5;
+            if (gameState.floatingRingSize > 200) gameState.floatingRingSize = 40;
+            
+            renderFloatingRing();
+        }
+
+        function captureFloatingRing() {
+            if (!gameState.gameActive || gameState.currentRingIndex >= gameState.targetSizes.length) return;
+            
+            const currentSize = gameState.floatingRingSize;
+            const targetSize = gameState.targetSizes[gameState.currentRingIndex];
+            const diff = Math.abs(currentSize - targetSize);
+            
+            if (diff <= gameState.tolerance * 2) {
+                // Calculate points based on accuracy
+                const accuracy = Math.max(0, gameState.tolerance * 2 - diff);
+                const points = 100 + accuracy * 5;
+                
+                // Create ring
+                const ring = {
+                    id: gameState.currentRingIndex + 1,
+                    size: currentSize,
+                    color: getRandomGradient()
+                };
+                
+                placeRingOnRod(ring);
+                gameState.currentRingIndex++;
+                gameState.score += points;
+                updateScore();
+                updateRemainingRings();
+                
+                // Reset floating ring
+                gameState.floatingRingSize = 80;
+                gameState.floatingRingDirection = 1;
+                
+                // Check level completion
+                if (gameState.currentRingIndex >= gameState.targetSizes.length) {
+                    showWinMessage();
+                } else {
+                    showMessage(`+${points} очков!`, 'success');
+                    renderFloatingRing();
+                }
+            } else {
+                // Failed capture
+                showMessage(`Промах! Правильный размер: ${targetSize}`, 'error');
+                setTimeout(restartLevel, 1500);
+            }
+        }
+
+        function updateRemainingRings() {
+            if (gameState.currentLevel === 1) return;
+            
+            const remaining = gameState.ringCount - gameState.currentRingIndex;
+            elements.remainingCount.textContent = remaining;
+        }
+
+        function showWinMessage() {
+            if (gameState.winMessageShown) return;
+            
+            gameState.winMessageShown = true;
+            gameState.gameActive = false;
+            clearInterval(gameState.timerInterval);
+            
+            // Calculate final score using the formula: score * remaining time
+            const remainingTime = gameState.timer;
+            gameState.finalScore = Math.round(gameState.score * remainingTime);
+            
+            const winMessage = document.createElement('div');
+            winMessage.className = 'win-message';
+            winMessage.id = 'win-message';
+            winMessage.innerHTML = `
+                <div>🎉 ПОБЕДА! 🎉</div>
+                <div style="font-size: 1.5rem; margin-top: 10px;">${gameState.score} × ${remainingTime} = ${gameState.finalScore} очков</div>
+            `;
+            document.querySelector('.game-area').appendChild(winMessage);
+            
+            // Save to leaderboard immediately with final score
+            saveToLeaderboard();
+            
+            // Transition to results after delay
+            setTimeout(() => {
+                completeLevel();
+            }, 2500);
+        }
+
+        function clearWinMessage() {
+            const winMessage = document.getElementById('win-message');
+            if (winMessage) {
+                winMessage.remove();
+            }
+        }
+
+        function startTimer() {
+            clearInterval(gameState.timerInterval);
+            gameState.timer = 45;
+            elements.timerDisplay.textContent = gameState.timer;
+            
+            gameState.timerInterval = setInterval(() => {
+                gameState.timer--;
+                elements.timerDisplay.textContent = gameState.timer;
+                
+                if (gameState.timer <= 0) {
+                    clearInterval(gameState.timerInterval);
+                    gameOver();
+                }
+            }, 1000);
+        }
+
+        function gameOver() {
+            gameState.gameActive = false;
+            clearInterval(gameState.timerInterval);
+            clearInterval(gameState.ballInterval);
+            
+            // Calculate final score for game over
+            gameState.finalScore = Math.round(gameState.score * 0); // 0 remaining time
+            
+            showMessage('Время вышло!', 'error');
+            setTimeout(showResults, 1000);
+        }
+
+        function completeLevel() {
+            // Unlock next level
+            if (gameState.currentLevel < 3) {
+                gameState.levelUnlocked[gameState.currentLevel] = true;
+            }
+            
+            showResults(true);
+        }
+
+        function showResults(success = false) {
+            hideAllScreens();
+            screens.results.classList.add('active');
+            
+            if (success) {
+                elements.resultTitle.textContent = 'Уровень пройден! 🎉';
+                elements.resultTitle.style.background = 'linear-gradient(to right, #00b894, #55efc4)';
+                elements.nextLevelBtn.style.display = gameState.currentLevel < 3 ? 'block' : 'none';
+            } else {
+                elements.resultTitle.textContent = 'Попробуй еще раз! 💪';
+                elements.resultTitle.style.background = 'linear-gradient(to right, #e17055, #ff7675)';
+                elements.nextLevelBtn.style.display = 'none';
+            }
+            
+            // Display final score using the formula
+            elements.finalScore.textContent = gameState.finalScore;
+            elements.scoreFormula.textContent = `(${gameState.score} очков × ${gameState.timer} сек осталось)`;
+            elements.ringsCollected.textContent = gameState.ringsOnRod.length;
+            elements.timeLeft.textContent = `${gameState.timer} сек`;
+        }
+
+        function restartLevel() {
+            startLevel(gameState.currentLevel);
+        }
+
+        function nextLevel() {
+            if (gameState.currentLevel < 3) {
+                startLevel(gameState.currentLevel + 1);
+            }
+        }
+
+        function updateScore() {
+            elements.scoreDisplay.textContent = gameState.score;
+        }
+
+        function showMessage(text, type) {
+            // Simple visual feedback
+            const gameArea = document.querySelector('.game-area');
+            const messageEl = document.createElement('div');
+            messageEl.textContent = text;
+            messageEl.style.position = 'absolute';
+            messageEl.style.top = '50%';
+            messageEl.style.left = '50%';
+            messageEl.style.transform = 'translate(-50%, -50%)';
+            messageEl.style.fontSize = '2rem';
+            messageEl.style.fontWeight = 'bold';
+            messageEl.style.padding = '1rem 2rem';
+            messageEl.style.borderRadius = '16px';
+            messageEl.style.zIndex = '100';
+            messageEl.style.textShadow = '0 0 10px black';
+            messageEl.style.animation = 'fadeMessage 1.5s forwards';
+            
+            if (type === 'success') {
+                messageEl.style.background = 'linear-gradient(to right, #00b894, #55efc4)';
+                messageEl.style.color = 'white';
+                messageEl.style.boxShadow = '0 0 20px rgba(0, 184, 148, 0.5)';
+            } else {
+                messageEl.style.background = 'linear-gradient(to right, #ff7675, #fd79a8)';
+                messageEl.style.color = 'white';
+                messageEl.style.boxShadow = '0 0 20px rgba(255, 118, 117, 0.5)';
+            }
+            
+            gameArea.appendChild(messageEl);
+            
+            setTimeout(() => {
+                if (messageEl.parentNode) {
+                    messageEl.style.opacity = '0';
+                    setTimeout(() => {
+                        if (messageEl.parentNode) {
+                            gameArea.removeChild(messageEl);
+                        }
+                    }, 500);
+                }
+            }, 1500);
+        }
+
+        function hideAllScreens() {
+            Object.values(screens).forEach(screen => {
+                screen.classList.remove('active');
+            });
+        }
+
+        function getRandomGradient() {
+            const gradients = [
+                'linear-gradient(to right, #6c5ce7, #a29bfe)',
+                'linear-gradient(to right, #00cec9, #81ecec)',
+                'linear-gradient(to right, #fdcb6e, #e17055)',
+                'linear-gradient(to right, #55efc4, #00b894)',
+                'linear-gradient(to right, #ff7675, #fd79a8)',
+                'linear-gradient(to right, #74b9ff, #0984e3)'
+            ];
+            return gradients[Math.floor(Math.random() * gradients.length)];
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // Leaderboard Functions
+        function saveToLeaderboard() {
+            try {
+                let leaderboard = JSON.parse(localStorage.getItem('pyramidLeaderboard')) || {};
+                
+                if (!leaderboard[gameState.currentPlayer]) {
+                    leaderboard[gameState.currentPlayer] = { level1: 0, level2: 0, level3: 0 };
+                }
+                
+                const levelKey = `level${gameState.currentLevel}`;
+                // Save the final score (with time multiplier)
+                if (gameState.finalScore > leaderboard[gameState.currentPlayer][levelKey]) {
+                    leaderboard[gameState.currentPlayer][levelKey] = gameState.finalScore;
+                    localStorage.setItem('pyramidLeaderboard', JSON.stringify(leaderboard));
+                }
+            } catch (e) {
+                console.error('Error saving to leaderboard:', e);
+            }
+        }
+
+        function loadLeaderboard() {
+            try {
+                const leaderboard = JSON.parse(localStorage.getItem('pyramidLeaderboard')) || {};
+                renderLeaderboard(leaderboard);
+            } catch (e) {
+                console.error('Error loading leaderboard:', e);
+                renderLeaderboard({});
+            }
+        }
+
+        function renderLeaderboard(leaderboard) {
+            elements.leaderboardBody.innerHTML = '';
+            
+            // Sort players by highest total score
+            const players = Object.keys(leaderboard).sort((a, b) => {
+                const totalA = leaderboard[a].level1 + leaderboard[a].level2 + leaderboard[a].level3;
+                const totalB = leaderboard[b].level1 + leaderboard[b].level2 + leaderboard[b].level3;
+                return totalB - totalA;
+            });
+            
+            players.forEach(player => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${player}</td>
+                    <td>${leaderboard[player].level1 || 0}</td>
+                    <td>${leaderboard[player].level2 || 0}</td>
+                    <td>${leaderboard[player].level3 || 0}</td>
+                `;
+                elements.leaderboardBody.appendChild(row);
+            });
+            
+            // Add current player if not in leaderboard
+            if (!leaderboard[gameState.currentPlayer] && gameState.currentPlayer) {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${gameState.currentPlayer} (ты)</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                `;
+                elements.leaderboardBody.appendChild(row);
+            }
+        }
+
+        function showLeaderboard() {
+            hideAllScreens();
+            screens.leaderboard.classList.add('active');
+            loadLeaderboard(); // Always reload leaderboard data when opening
+        }
+
+        // Ball cleanup
+        function clearBallState() {
+            clearInterval(gameState.ballInterval);
+            clearTimeout(gameState.ballWarningTimeout);
+            gameState.ball.active = false;
+            gameState.ball.dragging = false;
+            gameState.ball.speedWarning = false;
+            gameState.ball.escapeCooldown = 0;
+            elements.ball.style.display = 'none';
+            elements.ball.classList.remove('dragging', 'escaped');
+            elements.ballTarget.style.display = 'none';
+            elements.ballInstructions.style.display = 'none';
+            elements.ballWarning.style.display = 'none';
+        }
+
+        // Animation keyframes for messages
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @keyframes fadeMessage {
+                0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+                20% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+                80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+                100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Visual effects
+        function createClickEffect(x, y, color) {
+            const effect = document.createElement('div');
+            effect.className = 'mouse-click-effect';
+            effect.style.left = `${x}px`;
+            effect.style.top = `${y}px`;
+            effect.style.background = color;
+            document.body.appendChild(effect);
+            
+            setTimeout(() => {
+                if (effect.parentNode) {
+                    effect.remove();
+                }
+            }, 600);
+        }
+
+        function createKeyPressEffect(key, color) {
+            const gameAreaRect = elements.gameArea.getBoundingClientRect();
+            const x = gameAreaRect.left + gameAreaRect.width / 2;
+            const y = gameAreaRect.top + 100;
+            
+            const effect = document.createElement('div');
+            effect.className = 'mouse-click-effect';
+            effect.style.left = `${x}px`;
+            effect.style.top = `${y}px`;
+            effect.style.background = color;
+            effect.style.width = '80px';
+            effect.style.height = '80px';
+            effect.textContent = key;
+            effect.style.color = 'white';
+            effect.style.fontWeight = 'bold';
+            effect.style.display = 'flex';
+            effect.style.alignItems = 'center';
+            effect.style.justifyContent = 'center';
+            document.body.appendChild(effect);
+            
+            setTimeout(() => {
+                if (effect.parentNode) {
+                    effect.remove();
+                }
+            }, 600);
+        }
+
+        // Initialize level animations
+        initLevelAnimations();
+    </script>
 </body>
-
 </html>
